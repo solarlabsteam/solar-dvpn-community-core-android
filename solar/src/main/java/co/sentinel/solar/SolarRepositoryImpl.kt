@@ -18,7 +18,6 @@ import co.sentinel.solar.core.mapper.NodeMapper
 import co.sentinel.solar.core.model.CountryData
 import co.sentinel.solar.core.util.jsonToClass
 import co.sentinel.solar.core.util.safeApiCall
-import com.google.gson.Gson
 import timber.log.Timber
 
 
@@ -124,7 +123,7 @@ class SolarRepositoryImpl(
                 Continent(code, 0)
             }
 
-            val localCountries = context.jsonToClass<List<CountryData>>(R.raw.countries_data)
+            val localCountries = getLocalCountries(context)
             fetchCountries().let { fetchCountriesResult ->
                 when {
                     fetchCountriesResult.isRight -> {
@@ -156,7 +155,7 @@ class SolarRepositoryImpl(
 
     override suspend fun fetchCountriesByContinent(request: GetCountriesByContinentRequest): Either<Failure, FetchCountriesResult> =
         kotlin.runCatching {
-            val localCountries = context.jsonToClass<List<CountryData>>(R.raw.countries_data)
+            val localCountries = getLocalCountries(context)
                 .filter { it.continent == request.continent }.map { it.alpha2.lowercase() }
 
             fetchCountries().let { fetchCountriesResult ->
@@ -179,4 +178,7 @@ class SolarRepositoryImpl(
             Timber.e(it)
         }.getOrNull() ?: Either.Left(Failure.AppError)
 
+    private fun getLocalCountries(context: Context): List<CountryData> {
+        return context.jsonToClass<List<CountryData>>(R.raw.countries_data) ?: listOf()
+    }
 }
