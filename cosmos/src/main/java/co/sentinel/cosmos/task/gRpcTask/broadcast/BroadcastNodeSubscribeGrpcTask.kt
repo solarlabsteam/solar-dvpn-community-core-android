@@ -22,6 +22,7 @@ import kotlinx.coroutines.guava.await
 import org.bitcoinj.crypto.DeterministicKey
 import timber.log.Timber
 import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 
 class BroadcastNodeSubscribeGrpcTask(
@@ -59,6 +60,7 @@ class BroadcastNodeSubscribeGrpcTask(
 
             //broadCast
             val txService = ServiceGrpc.newFutureStub(ChannelBuilder.getChain(mBaseChain))
+                .withDeadlineAfter(ChannelBuilder.TIME_OUT.toLong(), TimeUnit.SECONDS)
             val broadcastTxRequest = Signer.getGrpcNodeSubscribeReq(
                 mAuthResponse,
                 mToAddress,
