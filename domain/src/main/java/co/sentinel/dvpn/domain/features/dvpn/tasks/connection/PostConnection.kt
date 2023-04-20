@@ -47,8 +47,10 @@ class PostConnection(
                 return Either.Left(loadActiveSession.requireLeft())
             }
             // do we need session id to be checked as well next to the node address
-            isSessionActive = loadActiveSession.requireRight()
-                .any { it.id == lastSession.id && it.node == params.nodeAddress }
+            isSessionActive = if (loadActiveSession.isRight) {
+                loadActiveSession.requireRight()
+                    .any { it.id == lastSession.id && it.node == params.nodeAddress }
+            } else false
         }
 
         // check if tunnel is running
