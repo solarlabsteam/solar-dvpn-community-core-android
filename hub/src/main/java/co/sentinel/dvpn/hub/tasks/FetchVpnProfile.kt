@@ -1,13 +1,12 @@
 package co.sentinel.dvpn.hub.tasks
 
-import android.util.Base64
 import co.sentinel.cosmos.dao.Account
 import co.sentinel.dvpn.domain.core.exception.Failure
-import co.sentinel.dvpn.domain.core.extension.bytesToUnsignedShort
 import co.sentinel.dvpn.domain.core.functional.Either
 import co.sentinel.dvpn.domain.features.hub.failure.VpnProfileFailure
 import co.sentinel.dvpn.domain.features.hub.model.VpnProfile
 import co.sentinel.dvpn.hub.core.extensions.await
+import co.sentinel.dvpn.hub.mapper.ProfileMapper
 import co.sentinel.dvpn.hub.mapper.VpnProfileErrorCodeMapper
 import co.sentinel.dvpn.hub.model.VpnProfileResponse
 import com.google.gson.Gson
@@ -78,7 +77,7 @@ object FetchVpnProfile : FetchVpnProfileInterface {
                 gson.fromJson(responseBody, VpnProfileResponse::class.java)
 
             if (vpnProfileResponse.success) {
-                val mappedVpnProfile = mapResultToVpnProfile(vpnProfileResponse.result!!)
+                val mappedVpnProfile = ProfileMapper.map(vpnProfileResponse.result!!)
                 Either.Right(mappedVpnProfile)
             } else {
                 val mappedVpnProfileError =
@@ -89,25 +88,6 @@ object FetchVpnProfile : FetchVpnProfileInterface {
 
     }.onFailure { Timber.e(it) }
         .getOrNull() ?: Either.Left(VpnProfileFailure.VpnProfileFetchFailure)
-
-    private fun mapResultToVpnProfile(result: String) =
-        Base64.decode(result, Base64.DEFAULT).let { bytes ->
-            val address =
-                "${bytes[0].toUByte()}.${bytes[1].toUByte()}.${bytes[2].toUByte()}.${bytes[3].toUByte()}/32"
-            val port = bytesToUnsignedShort(bytes[24], bytes[25], bigEndian = true)
-            val host =
-                "${bytes[20].toUByte()}.${bytes[21].toUByte()}.${bytes[22].toUByte()}.${bytes[23].toUByte()}"
-            val peerEndpoint = "$host:$port"
-            val pubKeyBytes = bytes.copyOfRange(26, 58)
-
-            VpnProfile(
-                address = address,
-                host = host,
-                listenPort = "$port",
-                peerEndpoint = peerEndpoint,
-                peerPubKeyBytes = pubKeyBytes
-            )
-        }
 
     private fun generateBodyObject(key: String, signature: String) =
         with(JsonObject()) {

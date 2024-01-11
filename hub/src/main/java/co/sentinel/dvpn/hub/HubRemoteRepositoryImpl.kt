@@ -11,9 +11,12 @@ import co.sentinel.dvpn.domain.core.functional.requireLeft
 import co.sentinel.dvpn.domain.core.functional.requireRight
 import co.sentinel.dvpn.domain.core.generateCoinFromPrice
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.PostConnection
+import co.sentinel.dvpn.domain.features.hub.failure.VpnProfileFailure
 import co.sentinel.dvpn.domain.features.hub.model.Quota
 import co.sentinel.dvpn.domain.features.hub.model.Session
+import co.sentinel.dvpn.domain.features.hub.model.VpnProfile
 import co.sentinel.dvpn.domain.features.hub.source.HubRemoteRepository
+import co.sentinel.dvpn.hub.mapper.ProfileMapper
 import co.sentinel.dvpn.hub.mapper.SessionMapper
 import co.sentinel.dvpn.hub.mapper.SubscriptionMapper
 import co.sentinel.dvpn.hub.tasks.*
@@ -220,4 +223,11 @@ class HubRemoteRepositoryImpl(private val app: BaseCosmosApp) : HubRemoteReposit
         }
     }.onFailure { Timber.e(it) }
         .getOrNull() ?: Either.Left(Failure.AppError)
+
+    override suspend fun parseVpnProfile(
+        payload: String,
+    ): Either<Failure, VpnProfile> = kotlin.runCatching {
+        Either.Right(ProfileMapper.map(payload))
+    }.onFailure { Timber.e(it) }
+        .getOrNull() ?: Either.Left(VpnProfileFailure.VpnProfileFetchFailure)
 }

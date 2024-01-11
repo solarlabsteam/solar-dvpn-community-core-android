@@ -7,6 +7,7 @@ import co.sentinel.dvpn.domain.core.functional.requireLeft
 import co.sentinel.dvpn.domain.core.functional.requireRight
 import co.sentinel.dvpn.domain.features.dvpn.GetTunnel
 import co.sentinel.dvpn.domain.features.dvpn.SetTunnelState
+import co.sentinel.dvpn.domain.features.dvpn.model.ConnectionCredentials
 import co.sentinel.dvpn.domain.features.dvpn.model.ConnectionEvent
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.ConnectionEventBus
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.DeleteConfiguration
@@ -28,6 +29,7 @@ import ee.solarlabs.community.core.model.HttpError
 import ee.solarlabs.community.core.model.TunnelServiceError.Companion.tunnelNotFound
 import ee.solarlabs.community.core.model.WalletServiceError.Companion.missingMnemonics
 import ee.solarlabs.community.core.model.WalletServiceError.Companion.notEnoughTokens
+import ee.solarlabs.community.core.model.connection.request.PostConnectionCredentialsRequest
 import ee.solarlabs.community.core.model.connection.request.PostConnectionRequest
 import ee.solarlabs.community.core.model.connection.response.ConnectionErrorResponse
 import ee.solarlabs.community.core.model.connection.response.ConnectionResponse
@@ -99,7 +101,26 @@ fun Application.routeConnection() {
             call.respond(HttpStatusCode.Accepted)
 
             connectionEventBus.emitEvent(ConnectionEvent.AttemptToConnect(request.nodeAddress))
+        }
 
+        post("/api/connection/credentials") {
+            val request =
+                kotlin.runCatching { call.receive<PostConnectionCredentialsRequest>() }.getOrNull() ?: let {
+                    return@post call.respond(HttpStatusCode.BadRequest, HttpError.badRequest)
+                }
+
+            call.respond(HttpStatusCode.Accepted)
+
+            connectionEventBus.emitEvent(
+                ConnectionEvent.AttemptToConnectWithCredentials(
+                    ConnectionCredentials(
+                        payload = request.payload,
+                        privateKey = request.privateKey,
+                        nodeAddress = request.nodeAddress,
+                        subscriptionId = request.subscriptionId,
+                    ),
+                ),
+            )
         }
 
         /**

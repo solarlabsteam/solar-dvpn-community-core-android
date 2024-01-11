@@ -3,7 +3,6 @@ package co.sentinel.dvpn.domain.features.hub.source
 import co.sentinel.cosmos.dao.Account
 import co.sentinel.dvpn.domain.core.exception.Failure
 import co.sentinel.dvpn.domain.core.functional.Either
-import co.sentinel.dvpn.domain.features.hub.*
 import co.sentinel.dvpn.domain.features.hub.model.*
 import com.google.protobuf2.Any
 import sentinel.node.v1.NodeOuterClass
@@ -24,7 +23,7 @@ interface HubRemoteRepository {
     suspend fun generateCancelNodeSubscriptionMessage(subscriptionIds: List<Long>): List<Any>
     suspend fun generateConnectToNodeMessages(
         subscriptionId: Long,
-        nodeAddress: String
+        nodeAddress: String,
     ): Either<Failure, List<Any>>
 
     // Session
@@ -33,6 +32,8 @@ interface HubRemoteRepository {
     suspend fun fetchVpnProfile(
         session: Session,
         keyBase64: String,
-        signature: String
+        signature: String,
     ): Either<Failure, VpnProfile>
+
+    suspend fun parseVpnProfile(payload: String): Either<Failure, VpnProfile>
 }

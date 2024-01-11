@@ -97,6 +97,7 @@ interface DVPNRepository {
      * Generates private/public key pair for creating new tunnels.
      */
     fun generateKeyPair(): KeyPair
+    fun generateKeyPair(privateKey: String): KeyPair
 
     /**
      * Returns GoBackend implementation of VpnService Intent.

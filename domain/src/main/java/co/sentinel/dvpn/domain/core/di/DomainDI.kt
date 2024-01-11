@@ -24,6 +24,7 @@ import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.DeleteConnection
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.DeleteSessions
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.GetConnection
 import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.PostConnection
+import co.sentinel.dvpn.domain.features.dvpn.tasks.connection.PostConnectionWithCredentials
 import co.sentinel.dvpn.domain.features.hub.tasks.DeleteSubscription
 import co.sentinel.dvpn.domain.features.hub.tasks.GetQuota
 import co.sentinel.dvpn.domain.features.hub.tasks.GetSubscriptions
@@ -61,6 +62,7 @@ val domainModule = module {
     single { DeleteSessions(get(), get(), get()) }
     single { DeleteConfiguration(get()) }
     single { PostConnection(get(), get(), get(), get()) }
+    single { PostConnectionWithCredentials(get(), get()) }
     single { GetConnection(get()) }
     single { CreateTunnel(get()) }
     single { DeleteTunnel(get()) }

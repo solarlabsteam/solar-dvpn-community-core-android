@@ -577,11 +577,18 @@ class DVPNRepositoryImpl(
 
     override fun generateKeyPair() = with(KeyPair()) {
         DomainKeyPair(
-            privateKeyHex = privateKey.toHex(),
             privateKeyBase64 = privateKey.toBase64(),
-            publicKeyHex = publicKey.toHex(),
             publicKeyBase64 = publicKey.toBase64()
         )
+    }
+
+    override fun generateKeyPair(privateKey: String): DomainKeyPair {
+        return with(KeyPair(Key.fromBase64(privateKey))) {
+            DomainKeyPair(
+                privateKeyBase64 = privateKey,
+                publicKeyBase64 = publicKey.toBase64(),
+            )
+        }
     }
 
     override fun getVpnServiceIntent(activity: WeakReference<Context>) = activity.get()?.let {
