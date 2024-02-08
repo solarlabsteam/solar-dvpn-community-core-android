@@ -29,6 +29,7 @@ import ee.solarlabs.community.core.model.HttpError
 import ee.solarlabs.community.core.model.TunnelServiceError.Companion.tunnelNotFound
 import ee.solarlabs.community.core.model.WalletServiceError.Companion.missingMnemonics
 import ee.solarlabs.community.core.model.WalletServiceError.Companion.notEnoughTokens
+import ee.solarlabs.community.core.model.connection.request.DataWrapper
 import ee.solarlabs.community.core.model.connection.request.PostConnectionCredentialsRequest
 import ee.solarlabs.community.core.model.connection.request.PostConnectionRequest
 import ee.solarlabs.community.core.model.connection.response.ConnectionErrorResponse
@@ -105,7 +106,7 @@ fun Application.routeConnection() {
 
         post("/api/connection/credentials") {
             val request =
-                kotlin.runCatching { call.receive<PostConnectionCredentialsRequest>() }.getOrNull() ?: let {
+                kotlin.runCatching { call.receive<DataWrapper<PostConnectionCredentialsRequest>>() }.getOrNull() ?: let {
                     return@post call.respond(HttpStatusCode.BadRequest, HttpError.badRequest)
                 }
 
@@ -114,10 +115,8 @@ fun Application.routeConnection() {
             connectionEventBus.emitEvent(
                 ConnectionEvent.AttemptToConnectWithCredentials(
                     ConnectionCredentials(
-                        payload = request.payload,
-                        privateKey = request.privateKey,
-                        nodeAddress = request.nodeAddress,
-                        subscriptionId = request.subscriptionId,
+                        payload = request.data.payload,
+                        privateKey = request.data.privateKey,
                     ),
                 ),
             )

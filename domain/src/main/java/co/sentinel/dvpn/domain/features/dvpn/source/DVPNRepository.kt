@@ -109,7 +109,6 @@ interface DVPNRepository {
         vpnProfile: VpnProfile,
         keyPair: KeyPair,
         nodeAddress: String,
-        subscriptionId: Long
     ): Either<Failure, CreateTunnel.Success>
 
     suspend fun getTunnel(tunnelName: String): Either<Failure, GetTunnel.Success>

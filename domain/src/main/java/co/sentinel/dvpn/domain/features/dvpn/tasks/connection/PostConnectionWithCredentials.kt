@@ -33,8 +33,7 @@ class PostConnectionWithCredentials(
             DVPN_NODE_NAME,
             fetchVpnProfile.requireRight(),
             keyPair,
-            credentials.nodeAddress,
-            credentials.subscriptionId,
+            credentials.payload,
         )
 
         if (createOrUpdateTunnel.isLeft) {

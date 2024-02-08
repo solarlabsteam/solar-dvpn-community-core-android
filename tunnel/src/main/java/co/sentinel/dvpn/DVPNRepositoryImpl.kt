@@ -220,7 +220,6 @@ class DVPNRepositoryImpl(
         vpnProfile: VpnProfile,
         keyPair: DomainKeyPair,
         nodeAddress: String,
-        subscriptionId: Long
     ): Either<Failure, CreateTunnel.Success> =
         kotlin.runCatching {
             vpnProfile.let {
@@ -263,14 +262,8 @@ class DVPNRepositoryImpl(
                                 )
                             )
                         ).let {
-                            userPreferenceStore.setSubscriptionId(subscriptionId)
+                            userPreferenceStore.setSubscriptionId(null)
                             userPreferenceStore.setNodeAddress(nodeAddress)
-                            subscriptionId.let {
-                                connectionDurationStore.saveConnectionTimestamp(
-                                    subscriptionId,
-                                    System.currentTimeMillis()
-                                )
-                            }
                             Either.Right(CreateTunnel.Success(TunnelToDomainTunnelMapper.map(it)))
                         }
                     }

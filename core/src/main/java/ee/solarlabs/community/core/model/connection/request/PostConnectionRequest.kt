@@ -12,8 +12,9 @@ data class PostConnectionCredentialsRequest(
     val payload: String,
     @SerializedName(value = "private_key")
     val privateKey: String,
-    @SerializedName("node_address")
-    val nodeAddress: String,
-    @SerializedName("subscription_id")
-    val subscriptionId: Long,
+)
+
+data class DataWrapper<T>(
+    @SerializedName("data")
+    val data: T,
 )

@@ -151,7 +151,6 @@ class PostConnection(
             fetchVpnProfile.requireRight(),
             keyPair,
             subscription.node,
-            subscription.id
         ).also {
             cacheRepository.setLastSession(session)
         }
